@@ -8,7 +8,9 @@ import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior, RetentionC
 import scala.concurrent.duration.DurationInt
 
 /**
- *
+ * The Iot Workflow Manager Object
+ * Holds the Pattern of how to create Data
+ * and Instructions to persist and preserve state
  */
 object IoTWorkflowManager {
 
@@ -30,7 +32,7 @@ object IoTWorkflowManager {
 
   /**
    *
-   * @param state State of a Sensor
+   * @param state   State of a Sensor
    * @param command command to be issued to the State for the Sensor
    * @return Persistent Reply-able Effect
    */
@@ -73,10 +75,12 @@ object IoTWorkflowManager {
 
   /**
    * The current state held by the persistent entity.
+   * Instructions on How to handle the Event of Actor
    */
   final case class State(sensor: Sensor) extends CborSerializable {
 
     def writeData(sensor: Sensor): State = {
+
       copy(sensor = sensor)
     }
 
@@ -87,6 +91,8 @@ object IoTWorkflowManager {
 
   final case class WriteSensorData(sensor: Sensor, replyTo: ActorRef[StatusReply[Sensor]]) extends Command
 
+
+
   final case class SensorReading(temp: Double = 0, humidity: Double = 0, dewPoint: Double = 0, airPressure: Double = 0, units: String = "", unitType: String = "")
 
   final case class Sensor(sensorID: String, regionID: String = "", lat: Double = 0, long: Double = 0, reading: SensorReading = SensorReading())
@@ -94,6 +100,7 @@ object IoTWorkflowManager {
   final case class WriteData(sensorID: String, sensorPayload: Sensor) extends Event
 
   final case class DropData(sensorID: String, sensorPayload: Sensor) extends Event
+
 
   /**
    * New State of New Sensor
