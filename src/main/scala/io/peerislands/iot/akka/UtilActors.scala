@@ -1,46 +1,35 @@
 package io.peerislands.iot.akka
 
-import akka.actor.{Actor, ActorLogging}
-import akka.persistence.PersistentActor
+import akka.actor.{Actor, ActorLogging, ActorRef}
 import io.peerislands.iot.akka.IoTWorkflowManager.Sensor
 
 object UtilActors {
 
-  class ConvertTempToFahrenheitActor extends PersistentActor with ActorLogging{
+  def continueProcessing(sensor: Sensor, replySeq: Seq[ActorRef]): Unit =
+    replySeq.head ! Process(sensor, replySeq.tail)
+
+  class ConvertTempToFahrenheitActor extends Actor with ActorLogging {
     override def receive: Receive = {
-      case Sensor =>
+      case Process(sensor, replySeq: Seq[ActorRef]) =>
+        continueProcessing(sensor, replySeq)
     }
-
-    override def receiveRecover: Receive = ???
-
-    override def receiveCommand: Receive = ???
-
-    override def persistenceId: String = ???
   }
 
-  class ValidateDataActor extends PersistentActor with ActorLogging{
+  class ValidateDataActor extends Actor with ActorLogging {
     override def receive: Receive = {
-      case Sensor =>
+      case Process(sensor, replySeq: Seq[ActorRef]) =>
+        continueProcessing(sensor, replySeq)
 
     }
-
-    override def receiveRecover: Receive = ???
-
-    override def receiveCommand: Receive = ???
-
-    override def persistenceId: String = ???
   }
 
-  class FetchAddressActor extends PersistentActor with ActorLogging{
+  class FetchAddressActor extends Actor with ActorLogging {
     override def receive: Receive = {
-      case Sensor =>
+      case Process(sensor, replySeq: Seq[ActorRef]) =>
+        continueProcessing(sensor, replySeq)
 
     }
-
-    override def receiveRecover: Receive = ???
-
-    override def receiveCommand: Receive = ???
-
-    override def persistenceId: String = ???
   }
 }
+
+final case class Process(sensor: Sensor, replySeq: Seq[ActorRef])
